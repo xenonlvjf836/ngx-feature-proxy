@@ -1,30 +1,23 @@
-name: Release
+name: Run 20 Selenium Instances
+
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
-  release:
+  run-job:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        instance: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+
     steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
+      - name: Pull Docker image
+        run: docker pull nduythanh1/selenium-videozz-multiprocess:latest
 
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: yarn
-          cache-dependency-path: yarn.lock
-
-      - run: yarn install --frozen-lockfile
-
-      - run: npx semantic-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Run container (13 minutes)
+        run: |
+          echo "Starting instance ${{ matrix.instance }}"
+          timeout 780s docker run --rm nduythanh1/selenium-videozz-multiprocess:latest || true
+          echo "Finished instance ${{ matrix.instance }}"
